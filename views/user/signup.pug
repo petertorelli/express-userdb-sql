@@ -1,0 +1,35 @@
+extends top
+
+block title
+	title Sign up
+
+block action
+	form(action='signup' method='post')
+		.form-group
+			label(for='email') Email Address
+			input(
+				required
+				type='email'
+				name='email'
+				value=email
+			).form-control
+		.form-group
+			label(for='password') Password (30 character max)
+			input(
+				required
+				type='password'
+				name='password'
+				maxlength=30
+			).form-control
+		.form-group
+			label(for='repassword') Re-enter password
+			input(
+				required
+				type='password'
+				name='repassword'
+				maxlength=30
+			).form-control
+		button(type='submit').btn.btn-primary Sign up
+	small
+		a(href='login') Already have an account? Log in!
+

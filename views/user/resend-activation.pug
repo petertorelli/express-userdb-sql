@@ -1,0 +1,15 @@
+extends top
+
+block title
+	title Resend Activation
+
+block action
+	h2 Please enter your email address.
+	p.
+		An email will be sent to you with a link that you can use to 
+		activate your account.
+	form(action='resend-activation' method='post')
+		.form-group
+			label(for='email') Email Address
+			input(type='email' name='email' required).form-control#email
+		button(type='submit').btn.btn-primary Resend Activation

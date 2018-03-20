@@ -1,0 +1,40 @@
+extends top
+
+block title
+	title Log in
+
+block action
+	form(action='login' method='post')
+		.form-group
+			label(for='email') Email Address
+			input#email(
+				required
+				type='email'
+				name='email'
+				value=email
+				maxlength=254
+			).form-control
+		.form-group
+			label(for='password') Password
+			input#password(
+				required
+				type='password'
+				name='password'
+				maxlength=30
+			).form-control
+			small
+				a(href='reset-password') Forgot Password?
+		.form-check
+			input#remember(
+				type='checkbox'
+				name='remember'
+			).form-check-input
+			label(for='remember') Remember me?
+		button(type='submit').btn.btn-primary Login
+	small
+		span
+			a(href='signup') No Account? Sign up!
+		span &nbsp;&centerdot;&nbsp;
+		span
+			a(href='resend-activation') Resend activation email
+
