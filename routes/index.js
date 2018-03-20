@@ -6,7 +6,8 @@ router.use(validUser);
 
 router.get('/', (req, res) => {
 	if (res.locals.validUser === true) {
-		if (res.locals.userProfile.active  === 1) {
+		// This check is here in case the user is deactivated while logged on
+		if (res.locals.userProfile.active === 1) {
 			res.render('index', {
 				logAction: 'logout',
 			});
