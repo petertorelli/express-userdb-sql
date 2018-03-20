@@ -1,4 +1,4 @@
-This is a your basic, complete user-management framework that handles UX for:
+This is a your basic, complete user-management framework that handles UX, UI, frontend & backend for:
 
 * signup
 * login
