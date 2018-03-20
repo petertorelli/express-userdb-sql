@@ -8,6 +8,7 @@ This is a your basic, complete user-management framework that handles UX for:
 
 It uses:
 
+* Express
 * mysql for the database (schema included)
 * bcrypt for passwords and salt
 * NodeJS crypto for login token and authentication token generation
