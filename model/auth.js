@@ -300,6 +300,7 @@ module.exports.validateLoginToken = function (username, login_token) {
 			return Promise.resolve(results);
 		}
 		if (results.profile.login_token != login_token) {
+			// TODO: Fix this, can't leave the user hanging!
 			return Promise.resolve(generic_error);
 		}
 		return Promise.resolve(results);
