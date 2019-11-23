@@ -2,7 +2,7 @@
 const debug = require('debug')('auth');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
-const db = require('../db');
+const db = require('./db');
 
 // bcrypt
 const SALT_ROUNDS = 10;

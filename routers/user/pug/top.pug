@@ -9,17 +9,9 @@ html(lang='en')
 		.container(style='padding-top: 50px')
 			.row
 				.col-sm-12.offset-sm-0.col-lg-6.offset-lg-3
-					#error.alert.alert-warning Warning:&nbsp;
-						span#msg=error
+					div= error
 					block action
 					p.pt-3
 					hr
 					p
 						a(href='/') Home
-		script(language='javascript', src='/js/jquery.min.js')
-		script(language='javascript', src='/js/bootstrap.min.js')
-		//- TODO: Really want to avoid jQuery
-		script $('#msg').text() ? $('#error').show() : $('#error').hide()
-
-
-

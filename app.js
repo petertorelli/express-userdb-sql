@@ -1,64 +1,84 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var compression = require('compression');
+const express = require('express')
+const helmet = require('helmet')
+const path = require('path')
+const cookieSession = require('cookie-session')
+var bodyParser = require('body-parser')
 
-var index = require('./routes/index');
-var user = require('./routes/user');
+require('dotenv').config()
 
-var app = express();
+const userRouter = require('./routers/user')
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+const app = express()
 
-if (app.get('env') !== 'development') {
-  // Force all http to use https
-  app.use(function(req, res, next) {
-      if((!req.secure) && (req.get('X-Forwarded-Proto') !== 'https')) {
-          res.redirect('https://' + req.get('Host') + req.url);
-      } else {
-          next();
-    }
-  });
-}
+//app.use(helmet())
 
-app.use(compression());
-
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
 
-app.use(express.static(path.join(__dirname, 'public')));
+var expiryDate = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
+app.use(cookieSession({
+  keys: ['key1', 'key2'], // todo replace with process.env
+  cookie: {
+  	/*
+    secure: true,
+    httpOnly: true,
+    domain: 'example.com',
+    */
+    expires: expiryDate
+  }
+}))
+
+
 app.use(express.static(path.join(__dirname, 'node_modules/bootstrap/dist')));
-app.use('/js', express.static(path.join(__dirname, 'node_modules/jquery/dist')));
 
-app.use('/', index);
-app.use('/user', user);
+app.set('view engine', 'pug')
+
+app.use('/user', userRouter)
+
+app.get('/', (req, res) => {
+	res.send('main')
+})
+
+module.exports = app
+
+/*
+const createError = require('http-errors')
+const express = require('express')
+const cookieParser = require('cookie-parser')
+const logger = require('morgan')
+
+const indexRouter = require('./routes/index')
+const usersRouter = require('./routes/users')
+
+const app = express()
+
+// view engine setup
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'pug')
+
+app.use(logger('dev'))
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
+app.use(cookieParser())
+app.use(express.static(path.join(__dirname, 'public')))
+
+app.use('/', indexRouter)
+app.use('/users', usersRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
+	next(createError(404))
+})
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+	// set locals, only providing error in development
+	res.locals.message = err.message
+	res.locals.error = req.app.get('env') === 'development' ? err : {}
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+	// render the error page
+	res.status(err.status || 500)
+	res.render('error')
+})
 
-
-
-module.exports = app;
+*/

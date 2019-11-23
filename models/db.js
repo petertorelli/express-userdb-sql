@@ -1,5 +1,5 @@
 const mysql = require('mysql');
-const config = require('./config');
+const config = require('../config');
 
 function handleDisconnect () {
 	exports.sql = mysql.createConnection(config.sql);
@@ -26,4 +26,4 @@ function handleDisconnect () {
 
 handleDisconnect();
 
-// todo add close connection on process exit
+// TODO: Add a MySQL close connection on process exit

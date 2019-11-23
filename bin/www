@@ -5,7 +5,7 @@
  */
 
 var app = require('../app');
-var debug = require('debug')('cognito-example:server');
+var debug = require('debug')('express-userdb-sql:server');
 var http = require('http');
 
 /**
@@ -14,13 +14,6 @@ var http = require('http');
 
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
-
-console.log(process.argv)
-if (process.argv[2] === 'dev') {
-} else {
-	app.set('env', 'production');
-}
-console.log(' --- ', app.get('env'));
 
 /**
  * Create HTTP server.

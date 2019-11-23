@@ -2,14 +2,18 @@
 const debug = require('debug')('user');
 const express = require('express');
 const router = express.Router();
-const config = require('../config');
+const config = require('../../config');
 const jwt = require('jsonwebtoken');
-const authDb = require('../model/auth');
-const mail = require('../model/mail');
-const validUser = require('../middleware/valid-user');
+const authDb = require('../../models/auth');
+const mail = require('../../models/mail');
+const validUser = require('../../middlewares/valid-user');
+const path = require('path')
 
 // Used for all catch runtime errors, but send the failure to console.error().
-const generic_error = { error: 'The server encountered an error.' };
+const genericError = { error: 'The server encountered an error.' };
+
+// Views are stored per router
+const pugdir = path.resolve(__dirname, 'pug')
 
 /** TODO
  * Google captcha.
@@ -72,7 +76,7 @@ const setLoginCookie = function (username, login_token, req, res) {
 	} else {
 		// expire after browser closes
 	}
-	res.cookie('token', token, cookie_opts);
+	res.session('token', token, cookie_opts);
 }
 
 /**
@@ -81,63 +85,71 @@ const setLoginCookie = function (username, login_token, req, res) {
  */
 const doesPasswordSuck = function (a, b) {
 	if (a !== b) {
-		return 'Passwords do not match.';
+		return 'Passwords do not match.'
 	}
 	// Put password policy here
 }
 
+router.get('/', (req, res) => {
+	return res.render(path.resolve(pugdir, 'user'))
+})
+
 router.get('/login', (req, res) => {
-	return res.render('user/login');
-});
+	return res.render(path.resolve(pugdir, 'login'))
+})
 
 router.post('/login', (req, res) => {
-	debug('POST/login');
+	debug('POST/login')
 	authDb.login(req.body.email, req.body.password)
 	.then(results => {
 		if (results.error) {
-			return res.render('user/login', { error: results.error });
+			return res.render(path.resolve(pugdir, 'login'), {
+				error: results.error
+			})
 		}
-		setLoginCookie(results.username, results.login_token, req, res);
-		return res.redirect('/');
+		setLoginCookie(results.username, results.login_token, req, res)
+		return res.redirect('/')
 	})
 	.catch(error => {
-		console.error('RT-ERROR(POST/login):', error);
-		return res.render('user/login', generic_error);
-	});
-});
+		console.error('RT-ERROR(POST/login):', error)
+		return res.render(path.resolve(pugdir, 'login'), genericError)
+	})
+})
 
 router.get('/signup', (req, res) => {
-	return res.render('user/signup');
-});
+	return res.render(path.resolve(pugdir, 'signup'))
+})
 
 router.post('/signup', (req, res) => {
-	const sucks = doesPasswordSuck(req.body.password, req.body.repassword);
+	const sucks = doesPasswordSuck(req.body.password, req.body.repassword)
 	if (sucks) {
-		return res.render('user/signup', {
+		return res.render(path.resolve(pugdir, 'signup'), {
 			error: error,
 			email: req.body.email,
-		});
+		})
 	}
 	authDb.signup(req.body.email, req.body.password)
 	.then(results => {
 		if (results.error) {
-			return res.render('user/signup', { error: results.error });
+			return res.render(path.resolve(pugdir, 'signup'), {
+				error: results.error
+			})
 		}
 		return sendActivationEmail(req.body.email, results.auth_token)
 		.then(results => {
-			return res.render('user/wait-for-activate');
-		});
+			return res.render(path.resolve(pugdir, 'wait-for-activate'))
+		})
 		// test that a throw goes to the catch below TODO
 	})
 	.catch(error => {
 		console.error('RT-ERROR(POST/signup):', error);
-		return res.render('user/signup', generic_error);
-	});
-});
+		return res.render(path.resolve(pugdir, 'signup'), genericError)
+	})
+})
 
 router.get('/reset-password', (req, res) => {
-	return res.render('user/reset-password');
-});
+	return res.render(path.resolve(pugdir, 'reset-password'))
+})
 
 /**
  * Post from the reset-password page that sends a token to the email.
@@ -146,21 +158,21 @@ router.post('/request-reset-password', (req, res) => {
 	authDb.requestPasswordResetToken(req.body.email)
 	.then(results => {
 		if (results.error) {
-			return res.render('user/reset-password', {
+			return res.render(path.resolve(pugdir, 'reset-password'), {
 				error: results.error,
-			});
+			})
 		}
 		return sendPasswordResetEmail(req.body.email, results.auth_token)
 		.then(results => {
-			return res.render('user/wait-for-reset');
-		});
+			return res.render(path.resolve(pugdir, 'wait-for-reset'))
+		})
 		// test that a throw goes to the catch below TODO
 	})
 	.catch(error => {
-		console.error('RT-ERROR(POST/request-reset-password):', error);
-		return res.render('user/reset-password', generic_error);
-	});
-});
+		console.error('RT-ERROR(POST/request-reset-password):', error)
+		return res.render(path.resolve(pugdir, 'reset-password'), genericError)
+	})
+})
 
 /**
  * Render the change-password form, but either the user is logged in, or 
@@ -176,71 +188,75 @@ router.get('/change-password', validUser, (req, res) => {
 		authDb.loginViaToken(req.query.x)
 		.then(results => {
 			if (results.error) {
-				return res.render('user/reset-password', { error: results.error });
+				return res.render(path.resolve(pugdir, 'reset-password'), {
+					error: results.error
+				})
 			}
 			setLoginCookie(results.username, results.login_token, req, res);
-			return res.render('user/change-password');
+			return res.render(path.resolve(pugdir, 'change-password'))
 		})
 		.catch(error => {
-			console.error('RT-ERROR(GET/change-password):', error);
-			return res.render('user/reset-password', generic_error);
-		});
+			console.error('RT-ERROR(GET/change-password):', error)
+			return res.render('user/reset-password', genericError)
+		})
 	} else {
 		// Visitor tried to view this endpoint without an auth_token
 		if (res.locals.validUser) {
-			return res.render('user/change-password');
+			return res.render(path.resolve(pugdir, 'change-password'))
 		}
 		// Not logged in, so send to login page
-		return res.redirect('/user/login');
+		return res.redirect(path.resolve(pugdir, 'login'))
 	}
-});
+})
 
 /**
  * This is the endpoint that actually changes the password using the results
  * from the change-password view's form.
  */
 router.post('/change-password', validUser, (req, res) => {
-	const sucks = doesPasswordSuck(req.body.password, req.body.repassword);
+	const sucks = doesPasswordSuck(req.body.password, req.body.repassword)
 	if (sucks) {
-		return res.render('user/change-password', { error });
+		return res.render(path.resolve(pugdir, 'change-password'), { error })
 	}
 	authDb.changePassword(res.locals.userProfile.username, req.body.password)
 	.then(results => {
 		if (results.error) {
-			return res.render('user/change-password', { error: results.error });
+			return res.render(path.resolve(pugdir, 'change-password'), {
+				error: results.error
+			})
 		}
 		// Not logged in, so send to login page
-		return res.redirect('/');
+		return res.redirect('/')
 	})
 	.catch(error => {
-		console.error('RT-ERROR(POST/change-password):', error);
-		return res.render('user/change-password', generic_error);
-	});
-});
+		console.error('RT-ERROR(POST/change-password):', error)
+		return res.render(path.resolve(pugdir, 'change-password'), genericError)
+	})
+})
 
 router.get('/resend-activation', (req, res) => {
-	return res.render('user/resend-activation');
-});
+	return res.render(path.resolve(pugdir, 'resend-activation'))
+})
 
 router.post('/resend-activation', (req, res, next) => {
 	authDb.requestActivationToken(req.body.email)
 	.then(results => {
 		if (results.error) {
-			return res.render('user/wait-for-activate', {
+			return res.render(path.resolve(pugdir, 'wait-for-activate'), {
 				error: results.error,
 			});
 		}
 		return sendActivationEmail(req.body.email, results.auth_token)
 		.then(results => {
-			return res.render('user/wait-for-activate');
+			return res.render(path.resolve(pugdir, 'wait-for-activate'))
 		});
 		// test that a throw goes to the catch below TODO
 	})
 	.catch(error => {
-		console.error('RT-ERROR(POST/resend-activation):', error);
-		return res.render('user/resend-activation', generic_error);
-	});
-});
+		console.error('RT-ERROR(POST/resend-activation):', error)
+		return res.render(path.resolve(pugdir, 'resend-activation'), genericError)
+	})
+})
 
 /**
  * Activate the account if the token is valid, otherwise just go back to the
@@ -251,31 +267,31 @@ router.get('/activate', (req, res) => {
 		authDb.activateAccount(req.query.x)
 		.then(results => {
 			if (results.error) {
-				return res.render('user/wait-for-activate', {
+				return res.render(path.resolve(pugdir, 'wait-for-activate'), {
 					error: results.error,
 					email: req.body.email,
-				});
+				})
 			}
 			// This renders the login page under the activate page, is OK?
-			return res.render('user/login', {
+			return res.render(path.resolve(pugdir, 'login'), {
 				error: 'Your account is activated but you need to log in.',
 				email: req.body.email,
-			});
+			})
 			// test that a throw goes to the catch below TODO
 		})
 		.catch(error => {
 			console.error('RT-ERROR(GET/activate):', error);
-			return res.render('user/wait-for-activate', generic_error);
-		});
+			return res.render(path.resolve(pugdir, 'wait-for-activate'), genericError)
+		})
 	} else {
 		// Visitor tried to activate without a token.
-		return res.redirect('/');
+		return res.redirect('/')
 	}
-});
+})
 
 router.get('/logout', (req, res) => {
-	res.clearCookie('token');
-	res.redirect('/');
+	res.clearCookie('token')
+	res.redirect('/')
 });
 
 module.exports = router;
