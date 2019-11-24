@@ -10,7 +10,10 @@ const validUser = require('../../middlewares/valid-user');
 const path = require('path')
 
 // Used for all catch runtime errors, but send the failure to console.error().
-const genericError = { error: 'The server encountered an error.' };
+const genericError = {
+	serverClass: 'alert alert-danger',
+	error: 'The server encountered an error.'
+}
 
 // Views are stored per router
 const pugdir = path.resolve(__dirname, 'pug')
@@ -105,6 +108,7 @@ router.post('/login', (req, res) => {
 	.then(results => {
 		if (results.error) {
 			return res.render(path.resolve(pugdir, 'login'), {
+				serverClass: 'alert alert-danger',
 				error: results.error
 			})
 		}
@@ -217,7 +221,7 @@ router.get('/change-password', validUser, (req, res) => {
 router.post('/change-password', validUser, (req, res) => {
 	const sucks = doesPasswordSuck(req.body.password, req.body.repassword)
 	if (sucks) {
-		return res.render(path.resolve(pugdir, 'change-password'), { error })
+		return res.render(path.resolve(pugdir, 'change-password'), { error, serverClass: 'alert alert-danger' })
 	}
 	authDb.changePassword(res.locals.userProfile.username, req.body.password)
 	.then(results => {
@@ -291,7 +295,7 @@ router.get('/activate', (req, res) => {
 })
 
 router.get('/logout', (req, res) => {
-	req.session = {}
+	req.session.token = {}
 	res.redirect('/')
 });
 
