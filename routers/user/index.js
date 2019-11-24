@@ -30,7 +30,7 @@ router.use((req, res, next) => {
 
 const sendActivationEmail = function (email, auth_token) {
 	debug('sendActivationEmail(', email, auth_token, ')');
-	let url = 'https://www.repete.io/user/activate?x=' + auth_token;
+	let url = 'https://repete.io/user/activate?x=' + auth_token;
 	return mail.send({
 		subject: 'Activate your account at repete.io',
 		to: email,
@@ -46,7 +46,7 @@ const sendActivationEmail = function (email, auth_token) {
 
 const sendPasswordResetEmail = function (email, auth_token) {
 	debug('sendPasswordResetEmail(', email, auth_token, ')');
-	let url = 'https://www.repete.io/user/change-password?x=' + auth_token;
+	let url = 'https://repete.io/user/change-password?x=' + auth_token;
 	return mail.send({
 		subject: 'Reset your account password at repete.io',
 		to: email,
@@ -76,7 +76,8 @@ const setLoginCookie = function (username, login_token, req, res) {
 	} else {
 		// expire after browser closes
 	}
-	res.session('token', token, cookie_opts);
+	req.session.token = token
+	//res.session('token', token, cookie_opts);
 }
 
 /**
@@ -290,7 +291,7 @@ router.get('/activate', (req, res) => {
 })
 
 router.get('/logout', (req, res) => {
-	res.clearCookie('token')
+	req.session = {}
 	res.redirect('/')
 });
 

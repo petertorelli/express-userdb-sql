@@ -2,11 +2,12 @@ const express = require('express')
 const helmet = require('helmet')
 const path = require('path')
 const cookieSession = require('cookie-session')
-var bodyParser = require('body-parser')
+const bodyParser = require('body-parser')
 
 require('dotenv').config()
 
 const userRouter = require('./routers/user')
+const indexRouter = require('./routers/index')
 
 const app = express()
 
@@ -34,10 +35,9 @@ app.use(express.static(path.join(__dirname, 'node_modules/bootstrap/dist')));
 app.set('view engine', 'pug')
 
 app.use('/user', userRouter)
+app.use('/', indexRouter)
 
-app.get('/', (req, res) => {
-	res.send('main')
-})
+
 
 module.exports = app
 
