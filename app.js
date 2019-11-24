@@ -8,13 +8,14 @@ require('dotenv').config()
 
 const userRouter = require('./routers/user')
 const indexRouter = require('./routers/index')
+const liddyRouter = require('./routers/liddycam')
 
 const app = express()
 
 //app.use(helmet())
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '100mb' }));
 
 var expiryDate = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
 app.use(cookieSession({
@@ -35,6 +36,7 @@ app.use(express.static(path.join(__dirname, 'node_modules/bootstrap/dist')));
 app.set('view engine', 'pug')
 
 app.use('/user', userRouter)
+app.use('/liddycam', liddyRouter)
 app.use('/', indexRouter)
 
 

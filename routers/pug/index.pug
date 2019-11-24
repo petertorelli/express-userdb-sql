@@ -1,0 +1,24 @@
+doctype html
+html(lang='en')
+	head
+		meta(charset='utf-8')
+		meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
+		link(rel='stylesheet', href='/css/bootstrap.min.css')
+	body
+		.container
+			header.blog-header.py-3
+				.row.flex-nowrap.justify-content-between.align-items-center
+					.col-1.pt-1
+						a(href='/') Home
+					.col-10.text-center
+						h2 User DB
+					.col-1.d-flex.justify-content-end.align-items-center
+						a(href='/user/' + logAction)=logAction
+			hr
+			.row
+				.col-12
+					a(href='/liddycam') Liddycam
+			.row
+				.col-12
+					#notice.alert.alert-warning Warning:&nbsp;
+						span#msg=warning
