@@ -39,20 +39,20 @@ function checkUserSecret (req, res, next) {
 			res.locals.userProfile = null
 			debug('error validating token, check console')
 			console.error(results.error)
-			next(new Error('The server encountered an error.'))
+			return next(new Error('The server encountered an error.'))
 		}
 		// valid user, obtain the profile for this session
 		debug('valid user')
 		res.locals.validUser = true
 		res.locals.userProfile = results.profile
-		next()
+		return next()
 	})
 	.catch(error => {
 		res.locals.validUser = false
 		res.locals.userProfile = null
 		debug('error validating token in catch')
 		console.error('checkUserSecret():', results.error)
-		next(new Error('The server encountered an error.'))
+		return next(new Error('The server encountered an error.'))
 	})
 }
 

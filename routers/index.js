@@ -7,18 +7,15 @@ router.get('/', validUser, (req, res) => {
 	if (res.locals.validUser === true) {
 		// This check is here in case the user is deactivated while logged on
 		if (res.locals.userProfile.active === 1) {
-			res.render(__dirname + '/pug/index', {
+			return res.render(__dirname + '/pug/index', {
 				logAction: 'logout',
 			})
 		} else {
 			// TODO this should go to a page with logout or something
-			next(new Error('Account not activated'))
+			return next(new Error('Account not activated'))
 		}
 	} else {
-		res.render(__dirname + '/pug/index', {
-			logAction: 'login',
-			warning: 'Not logged in.',
-		})
+		return res.redirect('/user/login')
 	}
 })
 
