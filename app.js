@@ -23,7 +23,7 @@ app.set('trust proxy', true)
 
 var expiryDate = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
 app.use(cookieSession({
-  keys: ['key1', 'key2'], // todo replace with process.env
+  keys: [process.env.KEY1, process.env.KEY2],
   cookie: {
   	/*
     secure: true,
