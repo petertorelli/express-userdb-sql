@@ -10,15 +10,12 @@ This is a your basic, complete user-management framework that handles UX, UI, fr
 
 It uses:
 
-* Express
-* Pug for rendering because screw HTML
-* Bootstrap because its easy and makes things look good
-* mysql for the database (schema included)
-* bcrypt for passwords and salt (10 rounds)
-* NodeJS crypto for login token and authentication token generation
-* JWT for persistant browser storage of the login token
-* RunBox for email
-
-It's about 95% there.
-
-TODO: Better UI error rendering w/o a JS framework.
+* [Express](https://expressjs.com/) because its flexibility keeps the site small
+* [VueJS](https://vuejs.org/) because VueJS finally figured out what ReactJS was trying to do
+* [FontAwesome](https://fontawesome.com/) because its such a great service
+* [Pug](https://pugjs.org/api/getting-started.html) because screw HTML
+* [Bootstrap](https://getbootstrap.com/) because its easy and makes things look good
+* [bcrypt](https://en.wikipedia.org/wiki/Bcrypt) because it seems to still be holding strong
+* [JWT](https://jwt.io/) for persistant browser storage of the login token because I don't go crazy with them
+* [RunBox](https://runbox.com/) for email because Norway understands privacy; this can be changed in the `models`
+* [mysql](https://www.npmjs.com/package/mysql) for the database (schema included); this can be changed in the `models`
