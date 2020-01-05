@@ -1,5 +1,5 @@
 'use strict'
-const debug = require('debug')('user');
+const debug = require('debug')('userapp:user');
 const express = require('express');
 const router = express.Router();
 const config = require('../../config');
@@ -74,11 +74,12 @@ const setLoginCookie = function (username, login_token, req, res) {
 	// BUGBUG If the JWT expires, local changes aren't saved!!!!
 	let token = jwt.sign(payload, config.jwt.secret, { expiresIn: '14d' });
 	let cookie_opts = { httpOnly: true };
-	if (req.body.remember === 'on') {
+// TODO: Cookie expiration bug needs fixing.
+//	if (req.body.remember === 'on') {
 		cookie_opts.maxAge = 900000;
-	} else {
+///	} else {
 		// expire after browser closes
-	}
+//	}
 	req.session.token = token
 	//res.session('token', token, cookie_opts);
 }
@@ -279,7 +280,7 @@ router.get('/activate', (req, res) => {
 			}
 			// This renders the login page under the activate page, is OK?
 			return res.render(path.resolve(pugdir, 'login'), {
-				error: 'Your account is activated but you need to log in.',
+				error: `Your account is now activated but an admin needs to approve access. We will email you when this happens (or email ${process.env.ADMIN_EMAIL} if you dont hear from us soon).`,
 				email: req.body.email,
 			})
 			// test that a throw goes to the catch below TODO
