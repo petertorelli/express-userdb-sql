@@ -9,6 +9,7 @@ require('dotenv').config()
 const userRouter = require('./routers/user')
 const indexRouter = require('./routers/index')
 const liddyRouter = require('./routers/liddycam')
+const pingerRouter = require('./routers/pinger')
 
 const app = express()
 
@@ -16,6 +17,9 @@ const app = express()
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true, limit: '100mb' }));
+
+//get real ip address behind proxy
+app.set('trust proxy', true)
 
 var expiryDate = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
 app.use(cookieSession({
@@ -31,12 +35,17 @@ app.use(cookieSession({
 }))
 
 
+app.use(express.static(path.join(__dirname, 'node_modules/vue-resource/dist')));
+app.use(express.static(path.join(__dirname, 'node_modules/vue/dist')));
+app.use(express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free')));
 app.use(express.static(path.join(__dirname, 'node_modules/bootstrap/dist')));
+app.use('/img', express.static(path.join(__dirname, 'public/img')));
 
 app.set('view engine', 'pug')
 
 app.use('/user', userRouter)
 app.use('/liddycam', liddyRouter)
+app.use('/pinger', pingerRouter)
 app.use('/', indexRouter)
 
 
