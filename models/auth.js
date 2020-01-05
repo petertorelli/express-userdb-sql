@@ -1,5 +1,5 @@
 'use strict'
-const debug = require('debug')('auth');
+const debug = require('debug')('userapp:auth');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const db = require('./db');
@@ -275,6 +275,9 @@ module.exports.login = function (email, plaintext_password) {
 		}
 		if (results.profile.active === 0) {
 			return Promise.resolve({ error: 'Account has not been activated.'});
+		}
+		if (results.profile.security_level === 0) {
+			return Promise.resolve({ error: `Active account does not have high enough security level. Please email ${process.env.ADMIN_EMAIL} for approval.`});
 		}
 		return bcrypt.compare(plaintext_password, results.profile.password)
 		.then(res => {
